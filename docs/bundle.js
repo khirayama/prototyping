@@ -6,6 +6,7 @@
 class RealTimeCamera {
   constructor(canvasElement, options = {}) {
     this._options = options;
+    this._timerId = null;
 
     this._filterName = this._options.filterName || 'none';
     this._canvasElement = canvasElement;
@@ -35,7 +36,7 @@ class RealTimeCamera {
   }
 
   _startSyncVideoToCanvas() {
-    setInterval(() => {
+    this._timerId = setInterval(() => {
       this._ctx.drawImage(this._videoElement, 0, 0, this._canvasElement.width, this._canvasElement.height);
       if (this._filterName !== 'none') {
         this._applyFilter();
@@ -84,22 +85,6 @@ class RealTimeCamera {
     }
   }
 
-  setFilter(filterName) {
-    this._filterName = filterName;
-  }
-
-  snapshot(saveType) {
-    let imageType = 'image/png';
-    let fileName = 'sample.png';
-    if (saveType === 'jpeg') {
-      imageType = 'image/jpeg';
-      fileName = 'sample.jpg';
-    }
-    const base64 = this._canvasElement.toDataURL(imageType);
-    const blob = this._base64toBlob(base64);
-    this._saveBlob(blob, fileName);
-  }
-
   _base64toBlob(base64) {
     const tmp = base64.split(',');
     const data = atob(tmp[1]);
@@ -123,6 +108,31 @@ class RealTimeCamera {
     a.href = dataUrl;
     a.download = fileName;
     a.dispatchEvent(event);
+  }
+
+  setFilter(filterName) {
+    this._filterName = filterName;
+  }
+
+  snapshot(type = 'png', fileName = new Date().getTime()) {
+    // type: png, jpeg
+    const imageType = `image/${type}`;
+    const base64 = this._canvasElement.toDataURL(imageType);
+    const blob = this._base64toBlob(base64);
+    this._saveBlob(blob, fileName);
+  }
+
+  isPaused() {
+    return this._timerId === null;
+  }
+
+  pause() {
+    clearInterval(this._timerId);
+    this._timerId = null;
+  }
+
+  resume() {
+    this._startSyncVideoToCanvas();
   }
 }
 
@@ -159,7 +169,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const snapshotButton = document.querySelector('.snapshot-button');
   snapshotButton.addEventListener('click', () => {
-    realTimeCamera.snapshot();
+    if (realTimeCamera.isPaused()) {
+      realTimeCamera.resume();
+      snapshotButton.innerText = 'SNAPSHOT';
+    } else {
+      realTimeCamera.snapshot('png', `snapshot_${new Date().getTime()}.png`);
+      realTimeCamera.pause();
+      snapshotButton.innerText = 'RETRY';
+    }
   });
 });
 
