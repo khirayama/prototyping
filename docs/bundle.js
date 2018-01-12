@@ -1,9 +1,19 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// options
+// - filterName
+// - width
+// - height
 class RealTimeCamera {
-  constructor(canvasElement) {
-    this._filterName = 'none';
+  constructor(canvasElement, options = {}) {
+    this._options = options;
+
+    this._filterName = this._options.filterName || 'none';
     this._canvasElement = canvasElement;
     this._ctx = this._canvasElement.getContext('2d');
+    if (this._options.width && this._options.height) {
+      this._canvasElement.width = this._options.width;
+      this._canvasElement.height = this._options.height;
+    }
     this._videoElement = window.document.createElement('video');
 
     this._startStreamToVideo();
@@ -12,7 +22,7 @@ class RealTimeCamera {
 
   _startStreamToVideo() {
     navigator.getUserMedia({
-      video: true
+      video: this._options
     }, stream => {
       this._videoElement.style.display = 'none';
       this._videoElement.src = window.URL.createObjectURL(stream);
@@ -26,11 +36,11 @@ class RealTimeCamera {
 
   _startSyncVideoToCanvas() {
     setInterval(() => {
-      this._ctx.drawImage(this._videoElement, 0, 0, 260, 260);
+      this._ctx.drawImage(this._videoElement, 0, 0, this._canvasElement.width, this._canvasElement.height);
       if (this._filterName !== 'none') {
         this._applyFilter();
       }
-    }, 1000 / 60 * 2);
+    }, 1000 / 30);
   }
 
   _applyFilter() {
@@ -84,7 +94,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if (navigator.getUserMedia) {
     const canvas = document.querySelector('#canvas');
-    realTimeCamera = new RealTimeCamera(canvas);
+    const size = Math.min(600, window.innerWidth);
+    realTimeCamera = new RealTimeCamera(canvas, {
+      width: size,
+      height: size,
+      frameRate: {
+        ideal: 50,
+        max: 60
+      }
+    });
   }
 
   const noneFilterButton = document.querySelector('.filter-button__none');
