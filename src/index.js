@@ -115,7 +115,7 @@ class RealTimeCamera {
     const dataUrl = url.createObjectURL(blob);
     const event = document.createEvent('MouseEvents');
     event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-    const a = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+    const a = document.createElement('a');
     a.href = dataUrl;
     a.download = fileName;
     a.dispatchEvent(event);
