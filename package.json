@@ -1,0 +1,24 @@
+{
+  "name": "camera",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run server & npm run build:files:watch & npm run bundle:scripts:watch",
+    "build:files": "cpx src/**/*.html docs",
+    "build:files:watch": "cpx src/**/*.html docs -w",
+    "bundle:scripts": "browserify src/index.js -t [ envify ] -t [ babelify ] -o docs/bundle.js",
+    "bundle:scripts:watch": "watchify src/index.js -t [ envify ] -t [ babelify ] -o docs/bundle.js",
+    "server": "php -S 0.0.0.0:5000 -t docs"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babelify": "^8.0.0",
+    "browserify": "^15.1.0",
+    "cpx": "^1.5.0",
+    "envify": "^4.1.0",
+    "watchify": "^3.9.0"
+  }
+}
