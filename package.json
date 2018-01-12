@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run server & npm run build:files:watch & npm run bundle:scripts:watch",
+    "dev": "rm -rf docs && mkdir docs && npm run server & npm run build:files:watch & npm run bundle:scripts:watch",
     "build:files": "cpx src/**/*.html docs",
     "build:files:watch": "cpx src/**/*.html docs -w",
     "bundle:scripts": "browserify src/index.js -t [ envify ] -t [ babelify ] -o docs/bundle.js",
