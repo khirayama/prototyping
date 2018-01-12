@@ -41,6 +41,10 @@ class RealTimeCamera {
         this._grayscale(data);
         break;
       }
+      case ('sepia'): {
+        this._sepia(data);
+        break;
+      }
       default: {
         break;
       }
@@ -55,7 +59,15 @@ class RealTimeCamera {
       data[i] = filter;
       data[i + 1] = filter;
       data[i + 2] = filter;
-    };
+    }
+  }
+
+  _sepia(data) {
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = data[i] * 1.07;
+      data[i + 1] = data[i + 1] * .74;
+      data[i + 2] = data[i + 2] * .43;
+    }
   }
 
   setFilter(filterName) {
@@ -79,5 +91,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const grayFilterButton = document.querySelector('.filter-button__gray');
   grayFilterButton.addEventListener('click', () => {
     realTimeCamera.setFilter('grayscale');
+  });
+
+  const sepiaFilterButton = document.querySelector('.filter-button__sepia');
+  sepiaFilterButton.addEventListener('click', () => {
+    realTimeCamera.setFilter('sepia');
   });
 });
