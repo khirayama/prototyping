@@ -1,12 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-// options
-// - filterName
-// - width
-// - height
 class RealTimeCamera {
   constructor(canvasElement, options = {}) {
     this._options = options;
     this._timerId = null;
+    this._stream = null;
 
     this._filterName = this._options.filterName || 'none';
     this._canvasElement = canvasElement;
@@ -17,14 +14,14 @@ class RealTimeCamera {
     }
     this._videoElement = window.document.createElement('video');
 
-    this._startStreamToVideo();
-    this._startSyncVideoToCanvas();
+    this.start();
   }
 
   _startStreamToVideo() {
     navigator.getUserMedia({
       video: this._options
     }, stream => {
+      this._stream = stream;
       this._videoElement.style.display = 'none';
       this._videoElement.src = window.URL.createObjectURL(stream);
       this._videoElement.onloadedmetadata = e => {
@@ -129,9 +126,12 @@ class RealTimeCamera {
   pause() {
     clearInterval(this._timerId);
     this._timerId = null;
+    const tracks = this._stream.getVideoTracks();
+    tracks[0].stop();
   }
 
-  resume() {
+  start() {
+    this._startStreamToVideo();
     this._startSyncVideoToCanvas();
   }
 }
@@ -170,7 +170,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const snapshotButton = document.querySelector('.snapshot-button');
   snapshotButton.addEventListener('click', () => {
     if (realTimeCamera.isPaused()) {
-      realTimeCamera.resume();
+      realTimeCamera.start();
       snapshotButton.innerText = 'SNAPSHOT';
     } else {
       realTimeCamera.snapshot('png', `snapshot_${new Date().getTime()}.png`);

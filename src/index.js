@@ -1,11 +1,8 @@
-// options
-// - filterName
-// - width
-// - height
 class RealTimeCamera {
   constructor(canvasElement, options = {}) {
     this._options = options;
     this._timerId = null;
+    this._stream = null;
 
     this._filterName = this._options.filterName || 'none';
     this._canvasElement = canvasElement;
@@ -16,14 +13,14 @@ class RealTimeCamera {
     }
     this._videoElement = window.document.createElement('video');
 
-    this._startStreamToVideo();
-    this._startSyncVideoToCanvas();
+    this.start();
   }
 
   _startStreamToVideo() {
     navigator.getUserMedia({
       video: this._options,
     }, (stream) => {
+      this._stream = stream;
       this._videoElement.style.display = 'none';
       this._videoElement.src = window.URL.createObjectURL(stream);
       this._videoElement.onloadedmetadata = (e) => {
@@ -124,9 +121,12 @@ class RealTimeCamera {
   pause() {
     clearInterval(this._timerId);
     this._timerId = null;
+    const tracks = this._stream.getVideoTracks();
+    tracks[0].stop();
   }
 
-  resume() {
+  start() {
+    this._startStreamToVideo();
     this._startSyncVideoToCanvas();
   }
 }
@@ -165,7 +165,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const snapshotButton = document.querySelector('.snapshot-button');
   snapshotButton.addEventListener('click', () => {
     if (realTimeCamera.isPaused()) {
-      realTimeCamera.resume();
+      realTimeCamera.start();
       snapshotButton.innerText = 'SNAPSHOT';
     } else {
       realTimeCamera.snapshot('png', `snapshot_${new Date().getTime()}.png`);
