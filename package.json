@@ -9,6 +9,9 @@
     "build:files:watch": "cpx src/**/*.html docs -w",
     "bundle:scripts": "browserify src/index.js -t [ envify ] -t [ babelify ] -o docs/bundle.js",
     "bundle:scripts:watch": "watchify src/index.js -t [ envify ] -t [ babelify ] -o docs/bundle.js",
+    "lint": "eslint --fix --ignore-path .gitignore src",
+    "format": "prettier --ignore-path .gitignore --config .prettierrc --write 'src/**/!(*.html|*.png)'",
+    "precommit": "npm run lint && npm run format",
     "server": "php -S 0.0.0.0:5000 -t docs"
   },
   "author": "",
@@ -19,6 +22,10 @@
     "browserify": "^15.1.0",
     "cpx": "^1.5.0",
     "envify": "^4.1.0",
+    "eslint": "^4.15.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-xo-space": "^0.17.0",
+    "prettier": "^1.10.2",
     "watchify": "^3.9.0"
   }
 }
