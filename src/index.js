@@ -258,8 +258,8 @@ class RealTimeCamera {
         this._videoElement.srcObject = stream;
         this._videoElement.onloadedmetadata = (e) => {
           this._videoSize = {
-            width: e.path[0].videoWidth,
-            height: e.path[0].videoHeight,
+            width: this._videoElement.videoWidth,
+            height: this._videoElement.videoHeight,
           };
           this._videoElement.style.width = this._videoSize.width + 'px';
           this._videoElement.style.height = this._videoSize.height + 'px';
