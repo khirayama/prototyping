@@ -240,6 +240,10 @@ class RealTimeCamera {
     this._options = options;
     this._timerId = null;
     this._stream = null;
+    this._videoSize = {
+      width: 0,
+      height: 0
+    };
 
     this._filterName = this._options.filterName || 'none';
     this._filterOptions = null;
@@ -256,22 +260,42 @@ class RealTimeCamera {
 
   _startStreamToVideo() {
     navigator.getUserMedia({
-      video: this._options
+      video: true
     }, stream => {
       this._stream = stream;
       this._videoElement.style.display = 'none';
-      this._videoElement.src = window.URL.createObjectURL(stream);
-      this._videoElement.onloadedmetadata = () => {
+      // this._videoElement.src = window.URL.createObjectURL(stream);
+      this._videoElement.srcObject = stream;
+      this._videoElement.onloadedmetadata = e => {
+        this._videoSize = {
+          width: e.path[0].videoWidth,
+          height: e.path[0].videoHeight
+        };
+        this._videoElement.style.width = this._videoSize.width + 'px';
+        this._videoElement.style.height = this._videoSize.height + 'px';
         this._videoElement.play();
       };
     }, err => {
-      console.log('The following error occurred: ' + err.name);
+      console.log(err);
     });
   }
 
   _startSyncVideoToCanvas() {
     this._timerId = setInterval(() => {
-      this._ctx.drawImage(this._videoElement, 0, 0, this._canvasElement.width, this._canvasElement.height);
+      const width = this._canvasElement.width;
+      const height = this._canvasElement.height;
+
+      let size = null;
+      let startX = 0;
+      if (this._videoSize.width > this._videoSize.height) {
+        size = this._videoSize.height;
+        startX = (this._videoSize.width - size) / 2;
+      } else {
+        size = this._videoSize.width;
+      }
+
+      this._ctx.drawImage(this._videoElement, startX, 0, size, size, 0, 0, width, height);
+      // this._ctx.drawImage(this._videoElement, 0, 0, this._videoSize.height, this._videoSize.height, 0, 0, width, height);
       if (this._filterName !== 'none') {
         this._applyFilter();
       }
