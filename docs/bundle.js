@@ -165,7 +165,7 @@ const filters = {
     }
   },
   contrast: (imageData, options = 0) => {
-    // Contrast - the options value should be -1 to 1
+    // Contrast - the options value should be 0 to 255
     options *= 255;
     const data = imageData.data;
     const factor = 259 * (options + 255) / (255 * (259 - options));
@@ -245,7 +245,7 @@ class RealTimeCamera {
       height: 0
     };
 
-    this._filterName = this._options.filterName || 'none';
+    this._filters = [];
     this._filterOptions = null;
     this._canvasElement = canvasElement;
     this._ctx = this._canvasElement.getContext('2d');
@@ -281,12 +281,11 @@ class RealTimeCamera {
   }
 
   _startSyncVideoToCanvas() {
+    const width = this._canvasElement.width;
+    const height = this._canvasElement.height;
+    let size = null;
+    let startX = 0;
     this._timerId = setInterval(() => {
-      const width = this._canvasElement.width;
-      const height = this._canvasElement.height;
-
-      let size = null;
-      let startX = 0;
       if (this._videoSize.width > this._videoSize.height) {
         size = this._videoSize.height;
         startX = (this._videoSize.width - size) / 2;
@@ -295,16 +294,26 @@ class RealTimeCamera {
       }
 
       this._ctx.drawImage(this._videoElement, startX, 0, size, size, 0, 0, width, height);
-      if (this._filterName !== 'none') {
-        this._applyFilter();
+      if (this._filters.length !== 0) {
+        const imageData = this._ctx.getImageData(0, 0, size, size);
+        for (let i = 0; i < this._filters.length; i++) {
+          const filter = this._filters[i];
+          filters[filter.name](imageData, filter.options);
+        }
+        this._ctx.putImageData(imageData, 0, 0);
       }
     }, 1000 / 30);
   }
 
-  _applyFilter() {
-    const imageData = this._ctx.getImageData(0, 0, this._canvasElement.width, this._canvasElement.height);
-    filters[this._filterName](imageData, this._filterOptions);
-    this._ctx.putImageData(imageData, 0, 0);
+  addFilter(name, options) {
+    for (let i = 0; i < this._filters.length; i++) {
+      const filter = this._filters[i];
+      if (filter.name === name) {
+        filter.options = options;
+        return;
+      }
+    }
+    this._filters.push({ name, options });
   }
 
   _base64toBlob(base64) {
@@ -332,9 +341,8 @@ class RealTimeCamera {
     a.dispatchEvent(event);
   }
 
-  setFilter(filterName, filterOptions) {
-    this._filterName = filterName;
-    this._filterOptions = filterOptions;
+  setFilter(name, options) {
+    this._filters = [{ name, options }];
   }
 
   snapshot(type = 'png', fileName = new Date().getTime()) {
@@ -387,6 +395,23 @@ window.addEventListener('DOMContentLoaded', () => {
     const options = filterButton.dataset.options;
     filterButton.addEventListener('click', () => {
       realTimeCamera.setFilter(filterName, options);
+    });
+  }
+
+  const rangeInputs = document.querySelectorAll('input[type=range]');
+  for (let i = 0; i < rangeInputs.length; i++) {
+    const rangeInput = rangeInputs[i];
+    let isPressed = false;
+    rangeInput.addEventListener('mousedown', () => {
+      isPressed = true;
+    });
+    rangeInput.addEventListener('mousemove', () => {
+      if (isPressed) {
+        realTimeCamera.addFilter(rangeInput.name, (rangeInput.value - 128) / 128);
+      }
+    });
+    rangeInput.addEventListener('mouseup', () => {
+      isPressed = false;
     });
   }
 
