@@ -254,6 +254,9 @@ class RealTimeCamera {
       this._canvasElement.height = this._options.height;
     }
     this._videoElement = window.document.createElement('video');
+    this._videoElement.autoplay = true;
+    this._videoElement.playsInline = true;
+    this._videoElement.webkitPlaysInline = true;
 
     this.start();
   }
@@ -261,12 +264,18 @@ class RealTimeCamera {
   _startStreamToVideo() {
     navigator.getUserMedia({
       video: true,
-      audio: false
+      frameRate: {
+        ideal: 30,
+        max: 60
+      }
     }, stream => {
       this._stream = stream;
-      this._videoElement.style.display = 'none';
-      // this._videoElement.src = window.URL.createObjectURL(stream);
-      this._videoElement.srcObject = stream;
+      // this._videoElement.style.display = 'none';
+      try {
+        this._videoElement.src = window.URL.createObjectURL(stream);
+      } catch (e) {
+        this._videoElement.srcObject = stream;
+      }
       this._videoElement.onloadedmetadata = e => {
         this._videoSize = {
           width: this._videoElement.videoWidth,
