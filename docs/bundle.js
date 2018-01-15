@@ -249,10 +249,6 @@ class RealTimeCamera {
     this._filterOptions = null;
     this._canvasElement = canvasElement;
     this._ctx = this._canvasElement.getContext('2d');
-    if (this._options.width && this._options.height) {
-      this._canvasElement.width = this._options.width;
-      this._canvasElement.height = this._options.height;
-    }
     this._videoElement = window.document.createElement('video');
     this._videoElement.autoplay = true;
     this._videoElement.playsInline = true;
@@ -262,15 +258,9 @@ class RealTimeCamera {
   }
 
   _startStreamToVideo() {
-    navigator.getUserMedia({
-      video: true,
-      frameRate: {
-        ideal: 30,
-        max: 60
-      }
-    }, stream => {
+    navigator.getUserMedia(this._options, stream => {
       this._stream = stream;
-      // this._videoElement.style.display = 'none';
+      this._videoElement.style.display = 'none';
       try {
         this._videoElement.src = window.URL.createObjectURL(stream);
       } catch (e) {
@@ -305,7 +295,6 @@ class RealTimeCamera {
       }
 
       this._ctx.drawImage(this._videoElement, startX, 0, size, size, 0, 0, width, height);
-      // this._ctx.drawImage(this._videoElement, 0, 0, this._videoSize.height, this._videoSize.height, 0, 0, width, height);
       if (this._filterName !== 'none') {
         this._applyFilter();
       }
@@ -379,12 +368,14 @@ window.addEventListener('DOMContentLoaded', () => {
   if (navigator.getUserMedia) {
     const canvas = document.querySelector('#canvas');
     const size = Math.min(600, window.parent.screen.width, window.innerWidth);
+    canvas.width = size;
+    canvas.height = size;
     realTimeCamera = new RealTimeCamera(canvas, {
-      width: size,
-      height: size,
+      // FYI: video: {width: number, height: number} is not supported in Safari
+      video: true,
       frameRate: {
-        ideal: 50,
-        max: 60
+        ideal: 25,
+        max: 50
       }
     });
   }
