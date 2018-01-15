@@ -246,13 +246,13 @@ class RealTimeCamera {
     };
 
     this._filters = [];
-    this._filterOptions = null;
     this._canvasElement = canvasElement;
     this._ctx = this._canvasElement.getContext('2d');
     this._videoElement = window.document.createElement('video');
     this._videoElement.autoplay = true;
     this._videoElement.playsInline = true;
     this._videoElement.webkitPlaysInline = true;
+    this._videoElement.style.display = 'none';
 
     this.start();
   }
@@ -260,7 +260,6 @@ class RealTimeCamera {
   _startStreamToVideo() {
     navigator.getUserMedia(this._options, stream => {
       this._stream = stream;
-      this._videoElement.style.display = 'none';
       try {
         this._videoElement.src = window.URL.createObjectURL(stream);
       } catch (e) {
