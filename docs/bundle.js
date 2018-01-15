@@ -260,7 +260,8 @@ class RealTimeCamera {
 
   _startStreamToVideo() {
     navigator.getUserMedia({
-      video: true
+      video: true,
+      audio: false
     }, stream => {
       this._stream = stream;
       this._videoElement.style.display = 'none';

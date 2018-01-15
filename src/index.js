@@ -250,6 +250,7 @@ class RealTimeCamera {
     navigator.getUserMedia(
       {
         video: true,
+        audio: false,
       },
       stream => {
         this._stream = stream;
