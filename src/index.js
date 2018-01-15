@@ -255,7 +255,7 @@ class RealTimeCamera {
         } catch (e) {
           this._videoElement.srcObject = stream;
         }
-        this._videoElement.onloadedmetadata = (e) => {
+        this._videoElement.onloadedmetadata = () => {
           this._videoSize = {
             width: this._videoElement.videoWidth,
             height: this._videoElement.videoHeight,
@@ -304,7 +304,7 @@ class RealTimeCamera {
         return;
       }
     }
-    this._filters.push({name, options});
+    this._filters.push({ name, options });
   }
 
   _base64toBlob(base64) {
@@ -333,7 +333,7 @@ class RealTimeCamera {
   }
 
   setFilter(name, options) {
-    this._filters = [{name, options}];
+    this._filters = [{ name, options }];
   }
 
   snapshot(type = 'png', fileName = new Date().getTime()) {
@@ -390,7 +390,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   const rangeInputs = document.querySelectorAll('input[type=range]');
-  for (let i = 0; i< rangeInputs.length; i++) {
+  for (let i = 0; i < rangeInputs.length; i++) {
     const rangeInput = rangeInputs[i];
     let isPressed = false;
     rangeInput.addEventListener('mousedown', () => {
