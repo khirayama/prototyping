@@ -298,6 +298,9 @@ window.addEventListener('DOMContentLoaded', function () {
       // FYI: video: {width: number, height: number} is not supported in Safari
       video: {
         aspectRatio: 1,
+        width: {
+          ideal: 2560
+        },
         facingMode: {
           exact: 'environment'
         }
