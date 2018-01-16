@@ -5,10 +5,6 @@ export default class RealTimeCamera {
     this._options = options;
     this._timerId = null;
     this._stream = null;
-    this._videoSize = {
-      width: 0,
-      height: 0,
-    };
 
     this._filter = null;
     this._canvasElement = canvasElement;
@@ -30,15 +26,6 @@ export default class RealTimeCamera {
     } catch (e) {
       this._videoElement.srcObject = stream;
     }
-    this._videoElement.onloadedmetadata = () => {
-      this._videoSize = {
-        width: this._videoElement.videoWidth,
-        height: this._videoElement.videoHeight,
-      };
-      this._videoElement.style.width = this._videoSize.width + 'px';
-      this._videoElement.style.height = this._videoSize.height + 'px';
-      this._videoElement.play();
-    };
   }
 
   _startStreamToVideo() {
@@ -46,10 +33,10 @@ export default class RealTimeCamera {
       this._options,
       this._handleSuccess.bind(this),
       err => {
-        if (err.constraintName === 'facingMode') {
-          this._options.video = true;
-          this._startStreamToVideo();
+        if (err.constraintName === 'facingMode' && this._options.video !== true) {
+          delete this._options.video.facingMode;
         }
+        this._startStreamToVideo();
       },
     );
   }
@@ -59,16 +46,25 @@ export default class RealTimeCamera {
     const height = this._canvasElement.height;
     let size = null;
     let startX = 0;
-    this._timerId = setInterval(() => {
-      if (this._videoSize.width > this._videoSize.height) {
-        size = this._videoSize.height;
-        startX = (this._videoSize.width - size) / 2;
-      } else if (this._videoElement.width < this._videoElement.height) {
-        size = this._videoSize.width;
+
+    this._videoElement.addEventListener('loadedmetadata', () => {
+      const videoWidth = this._videoElement.videoWidth;
+      const videoHeight = this._videoElement.videoHeight;
+
+      this._videoElement.style.width = videoWidth + 'px';
+      this._videoElement.style.height = videoHeight + 'px';
+      this._videoElement.play();
+      if (videoWidth > videoHeight) {
+        size = videoHeight;
+        startX = (videoWidth - size) / 2;
+      } else if (videoWidth < videoHeight) {
+        size = videoWidth;
       } else {
         size = width;
       }
+    });
 
+    this._timerId = setInterval(() => {
       this._ctx.drawImage(this._videoElement, startX, 0, size, size, 0, 0, width, height);
       if (this._filter !== null) {
         const imageData = this._ctx.getImageData(0, 0, size, size);
