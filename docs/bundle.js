@@ -585,7 +585,7 @@ var RealTimeCamera = function () {
       this._timerId = setInterval(function () {
         _this2._ctx.drawImage(_this2._videoElement, startX, 0, size, size, 0, 0, width, height);
         if (_this2._filter !== null) {
-          var imageData = _this2._ctx.getImageData(0, 0, size, size);
+          var imageData = _this2._ctx.getImageData(0, 0, width, height);
           var data = imageData.data;
           _this2._filter(data);
           _this2._ctx.putImageData(imageData, 0, 0);

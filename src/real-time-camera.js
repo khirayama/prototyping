@@ -67,7 +67,7 @@ export default class RealTimeCamera {
     this._timerId = setInterval(() => {
       this._ctx.drawImage(this._videoElement, startX, 0, size, size, 0, 0, width, height);
       if (this._filter !== null) {
-        const imageData = this._ctx.getImageData(0, 0, size, size);
+        const imageData = this._ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
         this._filter(data);
         this._ctx.putImageData(imageData, 0, 0);
