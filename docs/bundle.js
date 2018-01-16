@@ -1,242 +1,516 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-/* eslint-disable no-sequences, no-unused-expressions */
-const util = {
-  _RGBtoHSV: (r, g, b) => {
-    r /= 255, g /= 255, b /= 255;
+'use strict';
 
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h;
-    const v = max;
-    const d = max - min;
-    const s = max === 0 ? 0 : d / max;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-    if (max === min) {
-      h = 0;
-    } else {
-      switch (max) {
-        case r:
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _lagrange = require('./lagrange');
+
+var _lagrange2 = _interopRequireDefault(_lagrange);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Filter = function () {
+  function Filter() {
+    _classCallCheck(this, Filter);
+
+    this._redLagrange = new _lagrange2.default(0, 0, 255, 255);
+    this._greenLagrange = new _lagrange2.default(0, 0, 255, 255);
+    this._blueLagrange = new _lagrange2.default(0, 0, 255, 255);
+  }
+
+  _createClass(Filter, [{
+    key: 'apply',
+    value: function apply(data) {
+      for (var i = 0; i < data.length; i += 4) {
+        data[i] = this._redLagrange.valueOf(data[i]);
+        data[i + 1] = this._redLagrange.valueOf(data[i + 1]);
+        data[i + 2] = this._redLagrange.valueOf(data[i + 2]);
+      }
+    }
+  }, {
+    key: 'none',
+    value: function none() {
+      this._redLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._greenLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._blueLagrange = new _lagrange2.default(0, 0, 255, 255);
+    }
+  }, {
+    key: 'amoro',
+    value: function amoro() {
+      this._redLagrange = new _lagrange2.default(0, 19, 255, 250);
+      this._redLagrange.addPoint(30, 62);
+      this._redLagrange.addPoint(82, 148);
+      this._redLagrange.addPoint(122, 88);
+      this._redLagrange.addPoint(145, 200);
+
+      this._greenLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._greenLagrange.addPoint(48, 72);
+      this._greenLagrange.addPoint(115, 188);
+      this._greenLagrange.addPoint(160, 120);
+      this._greenLagrange.addPoint(233, 245);
+
+      this._blueLagrange = new _lagrange2.default(0, 25, 255, 245);
+      this._blueLagrange.addPoint(35, 80);
+      this._blueLagrange.addPoint(106, 75);
+      this._blueLagrange.addPoint(151, 188);
+      this._blueLagrange.addPoint(215, 215);
+      this._blueLagrange.addPoint(240, 235);
+    }
+  }, {
+    key: 'mayfair',
+    value: function mayfair() {
+      this._redLagrange = new _lagrange2.default(0, 30, 254, 242);
+      this._redLagrange.addPoint(85, 110);
+      this._redLagrange.addPoint(125, 170);
+      this._redLagrange.addPoint(221, 232);
+
+      this._greenLagrange = new _lagrange2.default(0, 15, 255, 230);
+      this._greenLagrange.addPoint(40, 55);
+      this._greenLagrange.addPoint(80, 95);
+      this._greenLagrange.addPoint(142, 196);
+      this._greenLagrange.addPoint(188, 215);
+
+      this._blueLagrange = new _lagrange2.default(0, 15, 255, 225);
+      this._blueLagrange.addPoint(45, 60);
+      this._blueLagrange.addPoint(85, 115);
+      this._blueLagrange.addPoint(135, 185);
+      this._blueLagrange.addPoint(182, 215);
+      this._blueLagrange.addPoint(235, 230);
+    }
+  }, {
+    key: 'rise',
+    value: function rise() {
+      this._redLagrange = new _lagrange2.default(0, 25, 255, 255);
+      this._redLagrange.addPoint(30, 70);
+      this._redLagrange.addPoint(130, 192);
+      this._redLagrange.addPoint(170, 200);
+      this._redLagrange.addPoint(233, 233);
+
+      this._greenLagrange = new _lagrange2.default(0, 25, 255, 255);
+      this._greenLagrange.addPoint(30, 72);
+      this._greenLagrange.addPoint(65, 118);
+      this._greenLagrange.addPoint(100, 158);
+      this._greenLagrange.addPoint(152, 195);
+      this._greenLagrange.addPoint(210, 230);
+
+      this._blueLagrange = new _lagrange2.default(0, 35, 255, 255);
+      this._blueLagrange.addPoint(40, 75);
+      this._blueLagrange.addPoint(82, 124);
+      this._blueLagrange.addPoint(120, 162);
+      this._blueLagrange.addPoint(175, 188);
+      this._blueLagrange.addPoint(220, 214);
+    }
+  }, {
+    key: 'hudson',
+    value: function hudson() {
+      this._redLagrange = new _lagrange2.default(0, 35, 255, 255);
+      this._redLagrange.addPoint(42, 68);
+      this._redLagrange.addPoint(85, 115);
+      this._redLagrange.addPoint(124, 165);
+      this._redLagrange.addPoint(170, 200);
+      this._redLagrange.addPoint(215, 228);
+
+      this._greenLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._greenLagrange.addPoint(45, 60);
+      this._greenLagrange.addPoint(102, 135);
+      this._greenLagrange.addPoint(140, 182);
+      this._greenLagrange.addPoint(192, 215);
+
+      this._blueLagrange = new _lagrange2.default(0, 0, 255, 245);
+      this._blueLagrange.addPoint(24, 42);
+      this._blueLagrange.addPoint(60, 100);
+      this._blueLagrange.addPoint(105, 170);
+      this._blueLagrange.addPoint(145, 208);
+      this._blueLagrange.addPoint(210, 235);
+    }
+  }, {
+    key: 'valencia',
+    value: function valencia() {
+      this._redLagrange = new _lagrange2.default(0, 20, 255, 240);
+      this._redLagrange.addPoint(50, 80);
+      this._redLagrange.addPoint(85, 120);
+      this._redLagrange.addPoint(128, 162);
+      this._redLagrange.addPoint(228, 224);
+
+      this._greenLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._greenLagrange.addPoint(18, 12);
+      this._greenLagrange.addPoint(60, 70);
+      this._greenLagrange.addPoint(104, 128);
+      this._greenLagrange.addPoint(148, 178);
+      this._greenLagrange.addPoint(212, 224);
+
+      this._blueLagrange = new _lagrange2.default(0, 20, 255, 230);
+      this._blueLagrange.addPoint(42, 62);
+      this._blueLagrange.addPoint(80, 104);
+      this._blueLagrange.addPoint(124, 144);
+      this._blueLagrange.addPoint(170, 182);
+      this._blueLagrange.addPoint(220, 210);
+    }
+  }, {
+    key: 'xPro2',
+    value: function xPro2() {
+      this._redLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._redLagrange.addPoint(42, 28);
+      this._redLagrange.addPoint(105, 100);
+      this._redLagrange.addPoint(148, 160);
+      this._redLagrange.addPoint(185, 208);
+
+      this._greenLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._greenLagrange.addPoint(40, 25);
+      this._greenLagrange.addPoint(85, 75);
+      this._greenLagrange.addPoint(125, 130);
+      this._greenLagrange.addPoint(165, 180);
+      this._greenLagrange.addPoint(212, 230);
+
+      this._blueLagrange = new _lagrange2.default(0, 30, 255, 222);
+      this._blueLagrange.addPoint(40, 58);
+      this._blueLagrange.addPoint(82, 90);
+      this._blueLagrange.addPoint(125, 125);
+      this._blueLagrange.addPoint(170, 160);
+      this._blueLagrange.addPoint(235, 210);
+    }
+  }, {
+    key: 'sierra',
+    value: function sierra() {
+      this._redLagrange = new _lagrange2.default(0, 10, 255, 245);
+      this._redLagrange.addPoint(48, 88);
+      this._redLagrange.addPoint(105, 155);
+      this._redLagrange.addPoint(130, 180);
+      this._redLagrange.addPoint(190, 212);
+      this._redLagrange.addPoint(232, 234);
+
+      this._greenLagrange = new _lagrange2.default(0, 0, 255, 230);
+      this._greenLagrange.addPoint(38, 72);
+      this._greenLagrange.addPoint(85, 124);
+      this._greenLagrange.addPoint(124, 160);
+      this._greenLagrange.addPoint(172, 186);
+      this._greenLagrange.addPoint(218, 210);
+
+      this._blueLagrange = new _lagrange2.default(0, 30, 255, 218);
+      this._blueLagrange.addPoint(45, 82);
+      this._blueLagrange.addPoint(95, 132);
+      this._blueLagrange.addPoint(138, 164);
+      this._blueLagrange.addPoint(176, 182);
+      this._blueLagrange.addPoint(210, 200);
+    }
+  }, {
+    key: 'willow',
+    value: function willow() {
+      this._redLagrange = new _lagrange2.default(0, 30, 255, 240);
+      this._redLagrange.addPoint(68, 105);
+      this._redLagrange.addPoint(95, 145);
+      this._redLagrange.addPoint(175, 215);
+
+      this._greenLagrange = new _lagrange2.default(0, 30, 255, 230);
+      this._greenLagrange.addPoint(55, 85);
+      this._greenLagrange.addPoint(105, 160);
+      this._greenLagrange.addPoint(198, 210);
+
+      this._blueLagrange = new _lagrange2.default(0, 30, 255, 288);
+      this._blueLagrange.addPoint(40, 70);
+      this._blueLagrange.addPoint(112, 165);
+      this._blueLagrange.addPoint(195, 215);
+    }
+  }, {
+    key: 'loFi',
+    value: function loFi() {
+      this._redLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._redLagrange.addPoint(40, 20);
+      this._redLagrange.addPoint(88, 80);
+      this._redLagrange.addPoint(128, 150);
+      this._redLagrange.addPoint(170, 200);
+      this._redLagrange.addPoint(230, 245);
+
+      this._greenLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._greenLagrange.addPoint(35, 15);
+      this._greenLagrange.addPoint(90, 70);
+      this._greenLagrange.addPoint(105, 105);
+      this._greenLagrange.addPoint(148, 180);
+      this._greenLagrange.addPoint(188, 218);
+
+      this._blueLagrange = new _lagrange2.default(0, 0, 255, 255);
+      this._blueLagrange.addPoint(62, 50);
+      this._blueLagrange.addPoint(100, 95);
+      this._blueLagrange.addPoint(130, 155);
+      this._blueLagrange.addPoint(150, 182);
+      this._blueLagrange.addPoint(190, 220);
+    }
+  }, {
+    key: 'filter',
+    value: function filter() {
+      this._redLagrange = new _lagrange2.default();
+      this._redLagrange.addPoint();
+      this._redLagrange.addPoint();
+      this._redLagrange.addPoint();
+      this._redLagrange.addPoint();
+      this._redLagrange.addPoint();
+
+      this._greenLagrange = new _lagrange2.default();
+      this._greenLagrange.addPoint();
+      this._greenLagrange.addPoint();
+      this._greenLagrange.addPoint();
+      this._greenLagrange.addPoint();
+      this._greenLagrange.addPoint();
+
+      this._blueLagrange = new _lagrange2.default();
+      this._blueLagrange.addPoint();
+      this._blueLagrange.addPoint();
+      this._blueLagrange.addPoint();
+      this._blueLagrange.addPoint();
+      this._blueLagrange.addPoint();
+    }
+  }]);
+
+  return Filter;
+}();
+
+exports.default = Filter;
+
+},{"./lagrange":3}],2:[function(require,module,exports){
+'use strict';
+
+var _realTimeCamera = require('./real-time-camera');
+
+var _realTimeCamera2 = _interopRequireDefault(_realTimeCamera);
+
+var _filter = require('./filter');
+
+var _filter2 = _interopRequireDefault(_filter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+window.addEventListener('DOMContentLoaded', function () {
+  var realTimeCamera = null;
+  var filter = new _filter2.default();
+
+  if (navigator.getUserMedia) {
+    var canvas = document.querySelector('#canvas');
+    var size = Math.min(600, window.parent.screen.width, window.innerWidth);
+    canvas.width = size;
+    canvas.height = size;
+    realTimeCamera = new _realTimeCamera2.default(canvas, {
+      // FYI: video: {width: number, height: number} is not supported in Safari
+      video: true,
+      frameRate: {
+        ideal: 25,
+        max: 50
+      },
+      facingMode: {
+        exact: 'environment'
+      }
+    });
+  }
+
+  var filterButtons = document.querySelectorAll('.filter-button');
+
+  var _loop = function _loop(i) {
+    var filterButton = filterButtons[i];
+    var filterName = filterButton.dataset.filtername;
+    filterButton.addEventListener('click', function () {
+      switch (filterName) {
+        case 'amoro':
           {
-            h = (g - b) / d + (g < b ? 6 : 0);
+            filter.amoro();
             break;
           }
-        case g:
+        case 'mayfair':
           {
-            h = (b - r) / d + 2;
+            filter.mayfair();
             break;
           }
-        case b:
+        case 'rise':
           {
-            h = (r - g) / d + 4;
+            filter.rise();
+            break;
+          }
+        case 'hudson':
+          {
+            filter.hudson();
+            break;
+          }
+        case 'valencia':
+          {
+            filter.valencia();
+            break;
+          }
+        case 'xPro2':
+          {
+            filter.xPro2();
+            break;
+          }
+        case 'sierra':
+          {
+            filter.sierra();
+            break;
+          }
+        case 'willow':
+          {
+            filter.willow();
+            break;
+          }
+        case 'loFi':
+          {
+            filter.loFi();
             break;
           }
         default:
           {
+            filter.none();
             break;
           }
       }
-      h /= 6;
-    }
+      realTimeCamera.setFilter(filter.apply.bind(filter));
+    });
+  };
 
-    return [h, s, v];
-  },
-
-  _HSVtoRGB: (h, s, v) => {
-    let r;
-    let g;
-    let b;
-
-    const i = Math.floor(h * 6);
-    const f = h * 6 - i;
-    const p = v * (1 - s);
-    const q = v * (1 - f * s);
-    const t = v * (1 - (1 - f) * s);
-
-    switch (i % 6) {
-      case 0:
-        {
-          r = v, g = t, b = p;
-          break;
-        }
-      case 1:
-        {
-          r = q, g = v, b = p;
-          break;
-        }
-      case 2:
-        {
-          r = p, g = v, b = t;
-          break;
-        }
-      case 3:
-        {
-          r = p, g = q, b = v;
-          break;
-        }
-      case 4:
-        {
-          r = t, g = p, b = v;
-          break;
-        }
-      case 5:
-        {
-          r = v, g = p, b = q;
-          break;
-        }
-      default:
-        {
-          break;
-        }
-    }
-    return [r * 255, g * 255, b * 255];
+  for (var i = 0; i < filterButtons.length; i++) {
+    _loop(i);
   }
-};
-/* eslint-enable no-sequences, no-unused-expressions */
 
-const filters = {
-  grayscale: imageData => {
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      const avg = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-      data[i] = avg;
-      data[i + 1] = avg;
-      data[i + 2] = avg;
+  var snapshotButton = document.querySelector('.snapshot-button');
+  snapshotButton.addEventListener('click', function () {
+    if (realTimeCamera.isPaused()) {
+      realTimeCamera.start();
+      snapshotButton.innerText = 'SNAPSHOT';
+    } else {
+      realTimeCamera.snapshot('png', 'snapshot_' + new Date().getTime() + '.png');
+      realTimeCamera.pause();
+      snapshotButton.innerText = 'RETRY';
     }
-  },
-  // Options is 0 (unchanged) to 1 (sepia)
-  sepia: (imageData, options = 0.8) => {
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      data[i] = r * (1 - 0.607 * options) + g * 0.769 * options + b * 0.189 * options;
-      data[i + 1] = r * 0.349 * options + g * (1 - 0.314 * options) + b * 0.168 * options;
-      data[i + 2] = r * 0.272 * options + g * 0.534 * options + b * (1 - 0.869 * options);
-    }
-  },
-  invert: imageData => {
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] = 255 - data[i];
-      data[i + 1] = 255 - data[i + 1];
-      data[i + 2] = 255 - data[i + 2];
-    }
-  },
-  // Options should be -1 (darker) to 1 (lighter). 0 is unchanged.
-  brightness: (imageData, options = 0.3) => {
-    const data = imageData.data;
-    options = options > 1 ? 1 : options;
-    options = options < -1 ? -1 : options;
-    options = ~~(255 * options);
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] += options;
-      data[i + 1] += options;
-      data[i + 2] += options;
-    }
-  },
-  hueSaturation: (imageData, options = 0.5) => {
-    // Better result (slow) - options should be < 1 (desaturated) to 1 (unchanged) and < 1
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      const hsv = util._RGBtoHSV(data[i], data[i + 1], data[i + 2]);
-      hsv[1] *= options;
-      const rgb = util._HSVtoRGB(hsv[0], hsv[1], hsv[2]);
-      data[i] = rgb[0];
-      data[i + 1] = rgb[1];
-      data[i + 2] = rgb[2];
-    }
-  },
-  saturation: (imageData, options = 1) => {
-    // Perceived saturation (faster) - options should be -1 (desaturated) to positive number. 0 is unchanged
-    const data = imageData.data;
-    options = options < -1 ? -1 : options;
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      const gray = 0.2989 * r + 0.587 * g + 0.114 * b; // Options from CCIR 601 spec
-      data[i] = -gray * options + data[i] * (1 + options);
-      data[i + 1] = -gray * options + data[i + 1] * (1 + options);
-      data[i + 2] = -gray * options + data[i + 2] * (1 + options);
-    }
-  },
-  contrast: (imageData, options = 0) => {
-    // Contrast - the options value should be 0 to 255
-    options *= 255;
-    const data = imageData.data;
-    const factor = 259 * (options + 255) / (255 * (259 - options));
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] = factor * (data[i] - 128) + 128;
-      data[i + 1] = factor * (data[i + 1] - 128) + 128;
-      data[i + 2] = factor * (data[i + 2] - 128) + 128;
-    }
-  },
-  colorFilter: (imageData, options = []) => {
-    // ColorFilter - add a slight color overlay. rgbColor is an array of [r, g, b, options]
-    const data = imageData.data;
-    const adj = options[3];
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] -= (data[i] - options[0]) * adj;
-      data[i + 1] -= (data[i + 1] - options[1]) * adj;
-      data[i + 2] -= (data[i + 2] - options[2]) * adj;
-    }
-  },
-  rgbAdjust: (imageData, options = []) => {
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      data[i] *= options[0]; // R
-      data[i + 1] *= options[1]; // G
-      data[i + 2] *= options[2]; // B
-    }
-  },
-  convolute: (imageData, options = []) => {
-    // Convolute - options(weights) are 3x3 matrix
-    const side = Math.round(Math.sqrt(options.length));
-    const halfSide = ~~(side / 2);
+  });
+});
 
-    const data = imageData.data;
-    const sw = imageData.width;
-    const sh = imageData.height;
+},{"./filter":1,"./real-time-camera":4}],3:[function(require,module,exports){
+'use strict';
 
-    const w = sw;
-    const h = sh;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const sy = y;
-        const sx = x;
-        const dstOff = (y * w + x) * 4;
-        let r = 0;
-        let g = 0;
-        let b = 0;
-        for (let cy = 0; cy < side; cy++) {
-          for (let cx = 0; cx < side; cx++) {
-            const scy = sy + cy - halfSide;
-            const scx = sx + cx - halfSide;
-            if (scy >= 0 && scy < sh && scx >= 0 && scx < sw) {
-              const srcOff = (scy * sw + scx) * 4;
-              const wt = options[cy * side + cx];
-              r += data[srcOff] * wt;
-              g += data[srcOff + 1] * wt;
-              b += data[srcOff + 2] * wt;
-            }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Lagrange = function () {
+  function Lagrange(x1, y1, x2, y2) {
+    _classCallCheck(this, Lagrange);
+
+    this.xs = [x1, x2];
+    this.ys = [y1, y2];
+    this.ws = [];
+    this._cache = null;
+
+    this._updateWeights();
+    this._createCache();
+  }
+
+  _createClass(Lagrange, [{
+    key: 'addPoint',
+    value: function addPoint(x, y) {
+      this.xs.push(x);
+      this.xs = this.xs.sort(function (a, b) {
+        return a - b;
+      });
+      this.ys.push(y);
+      this.ys = this.ys.sort(function (a, b) {
+        return a - b;
+      });
+      this._updateWeights();
+      this._createCache();
+
+      return this.xs.length - 1;
+    }
+  }, {
+    key: 'changePoint',
+    value: function changePoint(index, x, y) {
+      this.xs[index] = x;
+      this.ys[index] = y;
+      this._updateWeights();
+      this._createCache();
+    }
+  }, {
+    key: '_updateWeights',
+    value: function _updateWeights() {
+      var k = this.xs.length;
+      var w = void 0;
+
+      this._cache = null;
+
+      for (var j = 0; j < k; ++j) {
+        w = 1;
+        for (var i = 0; i < k; ++i) {
+          if (i !== j) {
+            w *= this.xs[j] - this.xs[i];
           }
         }
-        data[dstOff] = r;
-        data[dstOff + 1] = g;
-        data[dstOff + 2] = b;
+        this.ws[j] = 1 / w;
       }
     }
-  },
-  none: () => {}
-};
+  }, {
+    key: '_createCache',
+    value: function _createCache() {
+      this._cache = {};
+      for (var i = this.xs[0]; i < this.xs[this.xs.length - 1]; i++) {
+        this._cache['' + i] = this.valueOf(i);
+      }
+    }
+  }, {
+    key: 'valueOf',
+    value: function valueOf(x) {
+      if (this._cache !== null && this._cache['' + x] !== undefined) {
+        return this._cache['' + x];
+      }
+      var a = 0;
+      var b = 0;
+      var c = 0;
 
-class RealTimeCamera {
-  constructor(canvasElement, options = {}) {
+      for (var j = 0; j < this.xs.length; ++j) {
+        if (x === this.xs[j]) {
+          return this.ys[j];
+        }
+        a = this.ws[j] / (x - this.xs[j]);
+        b += a * this.ys[j];
+        c += a;
+      }
+
+      return b / c;
+    }
+  }]);
+
+  return Lagrange;
+}();
+
+exports.default = Lagrange;
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _filter = require('./filter');
+
+var _filter2 = _interopRequireDefault(_filter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var RealTimeCamera = function () {
+  function RealTimeCamera(canvasElement) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, RealTimeCamera);
+
     this._options = options;
     this._timerId = null;
     this._stream = null;
@@ -245,7 +519,7 @@ class RealTimeCamera {
       height: 0
     };
 
-    this._filters = [];
+    this._filter = null;
     this._canvasElement = canvasElement;
     this._ctx = this._canvasElement.getContext('2d');
     this._videoElement = window.document.createElement('video');
@@ -254,177 +528,125 @@ class RealTimeCamera {
     this._videoElement.webkitPlaysInline = true;
     this._videoElement.style.display = 'none';
 
-    this.start();
-  }
-
-  _startStreamToVideo() {
-    navigator.getUserMedia(this._options, stream => {
-      this._stream = stream;
-      try {
-        this._videoElement.src = window.URL.createObjectURL(stream);
-      } catch (e) {
-        this._videoElement.srcObject = stream;
-      }
-      this._videoElement.onloadedmetadata = () => {
-        this._videoSize = {
-          width: this._videoElement.videoWidth,
-          height: this._videoElement.videoHeight
-        };
-        this._videoElement.style.width = this._videoSize.width + 'px';
-        this._videoElement.style.height = this._videoSize.height + 'px';
-        this._videoElement.play();
-      };
-    }, err => {
-      console.log(err);
-    });
-  }
-
-  _startSyncVideoToCanvas() {
-    const width = this._canvasElement.width;
-    const height = this._canvasElement.height;
-    let size = null;
-    let startX = 0;
-    this._timerId = setInterval(() => {
-      if (this._videoSize.width > this._videoSize.height) {
-        size = this._videoSize.height;
-        startX = (this._videoSize.width - size) / 2;
-      } else {
-        size = this._videoSize.width;
-      }
-
-      this._ctx.drawImage(this._videoElement, startX, 0, size, size, 0, 0, width, height);
-      if (this._filters.length !== 0) {
-        const imageData = this._ctx.getImageData(0, 0, size, size);
-        for (let i = 0; i < this._filters.length; i++) {
-          const filter = this._filters[i];
-          filters[filter.name](imageData, filter.options);
-        }
-        this._ctx.putImageData(imageData, 0, 0);
-      }
-    }, 1000 / 30);
-  }
-
-  addFilter(name, options) {
-    for (let i = 0; i < this._filters.length; i++) {
-      const filter = this._filters[i];
-      if (filter.name === name) {
-        filter.options = options;
-        return;
-      }
-    }
-    this._filters.push({ name, options });
-  }
-
-  _base64toBlob(base64) {
-    const tmp = base64.split(',');
-    const data = atob(tmp[1]);
-    const mime = tmp[0].split(':')[1].split(';')[0];
-    const buf = new Uint8Array(data.length);
-    for (let i = 0; i < data.length; i++) {
-      buf[i] = data.charCodeAt(i);
-    }
-    const blob = new Blob([buf], {
-      type: mime
-    });
-    return blob;
-  }
-
-  _saveBlob(blob, fileName) {
-    const url = window.URL || window.webkitURL;
-    const dataUrl = url.createObjectURL(blob);
-    const event = document.createEvent('MouseEvents');
-    event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = fileName;
-    a.dispatchEvent(event);
-  }
-
-  setFilter(name, options) {
-    this._filters = [{ name, options }];
-  }
-
-  snapshot(type = 'png', fileName = new Date().getTime()) {
-    // Type: png, jpeg
-    const imageType = `image/${type}`;
-    const base64 = this._canvasElement.toDataURL(imageType);
-    const blob = this._base64toBlob(base64);
-    this._saveBlob(blob, fileName);
-  }
-
-  isPaused() {
-    return this._timerId === null;
-  }
-
-  pause() {
-    clearInterval(this._timerId);
-    this._timerId = null;
-    const tracks = this._stream.getVideoTracks();
-    tracks[0].stop();
-  }
-
-  start() {
     this._startStreamToVideo();
     this._startSyncVideoToCanvas();
   }
-}
 
-window.addEventListener('DOMContentLoaded', () => {
-  let realTimeCamera = null;
+  _createClass(RealTimeCamera, [{
+    key: '_startStreamToVideo',
+    value: function _startStreamToVideo() {
+      var _this = this;
 
-  if (navigator.getUserMedia) {
-    const canvas = document.querySelector('#canvas');
-    const size = Math.min(600, window.parent.screen.width, window.innerWidth);
-    canvas.width = size;
-    canvas.height = size;
-    realTimeCamera = new RealTimeCamera(canvas, {
-      // FYI: video: {width: number, height: number} is not supported in Safari
-      video: true,
-      frameRate: {
-        ideal: 25,
-        max: 50
-      }
-    });
-  }
-
-  const filterButtons = document.querySelectorAll('.filter-button');
-  for (let i = 0; i < filterButtons.length; i++) {
-    const filterButton = filterButtons[i];
-    const filterName = filterButton.dataset.filtername;
-    const options = filterButton.dataset.options;
-    filterButton.addEventListener('click', () => {
-      realTimeCamera.setFilter(filterName, options);
-    });
-  }
-
-  const rangeInputs = document.querySelectorAll('input[type=range]');
-  for (let i = 0; i < rangeInputs.length; i++) {
-    const rangeInput = rangeInputs[i];
-    let isPressed = false;
-    rangeInput.addEventListener('mousedown', () => {
-      isPressed = true;
-    });
-    rangeInput.addEventListener('mousemove', () => {
-      if (isPressed) {
-        realTimeCamera.addFilter(rangeInput.name, (rangeInput.value - 128) / 128);
-      }
-    });
-    rangeInput.addEventListener('mouseup', () => {
-      isPressed = false;
-    });
-  }
-
-  const snapshotButton = document.querySelector('.snapshot-button');
-  snapshotButton.addEventListener('click', () => {
-    if (realTimeCamera.isPaused()) {
-      realTimeCamera.start();
-      snapshotButton.innerText = 'SNAPSHOT';
-    } else {
-      realTimeCamera.snapshot('png', `snapshot_${new Date().getTime()}.png`);
-      realTimeCamera.pause();
-      snapshotButton.innerText = 'RETRY';
+      navigator.getUserMedia(this._options, function (stream) {
+        _this._stream = stream;
+        try {
+          _this._videoElement.src = window.URL.createObjectURL(stream);
+        } catch (e) {
+          _this._videoElement.srcObject = stream;
+        }
+        _this._videoElement.onloadedmetadata = function () {
+          _this._videoSize = {
+            width: _this._videoElement.videoWidth,
+            height: _this._videoElement.videoHeight
+          };
+          _this._videoElement.style.width = _this._videoSize.width + 'px';
+          _this._videoElement.style.height = _this._videoSize.height + 'px';
+          _this._videoElement.play();
+        };
+      }, function (err) {
+        console.log(err);
+      });
     }
-  });
-});
+  }, {
+    key: '_startSyncVideoToCanvas',
+    value: function _startSyncVideoToCanvas() {
+      var _this2 = this;
 
-},{}]},{},[1]);
+      var width = this._canvasElement.width;
+      var height = this._canvasElement.height;
+      var size = null;
+      var startX = 0;
+      this._timerId = setInterval(function () {
+        if (_this2._videoSize.width > _this2._videoSize.height) {
+          size = _this2._videoSize.height;
+          startX = (_this2._videoSize.width - size) / 2;
+        } else if (_this2._videoElement.width < _this2._videoElement.height) {
+          size = _this2._videoSize.width;
+        } else {
+          size = width;
+        }
+
+        _this2._ctx.drawImage(_this2._videoElement, startX, 0, size, size, 0, 0, width, height);
+        if (_this2._filter !== null) {
+          var imageData = _this2._ctx.getImageData(0, 0, size, size);
+          var data = imageData.data;
+          _this2._filter(data);
+          _this2._ctx.putImageData(imageData, 0, 0);
+        }
+      }, 1000 / 30);
+    }
+  }, {
+    key: 'setFilter',
+    value: function setFilter(filterFunc) {
+      this._filter = filterFunc;
+    }
+  }, {
+    key: '_base64toBlob',
+    value: function _base64toBlob(base64) {
+      var tmp = base64.split(',');
+      var data = atob(tmp[1]);
+      var mime = tmp[0].split(':')[1].split(';')[0];
+      var buf = new Uint8Array(data.length);
+      for (var i = 0; i < data.length; i++) {
+        buf[i] = data.charCodeAt(i);
+      }
+      var blob = new Blob([buf], {
+        type: mime
+      });
+      return blob;
+    }
+  }, {
+    key: '_saveBlob',
+    value: function _saveBlob(blob, fileName) {
+      var url = window.URL || window.webkitURL;
+      var dataUrl = url.createObjectURL(blob);
+      var event = document.createEvent('MouseEvents');
+      event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = fileName;
+      a.dispatchEvent(event);
+    }
+  }, {
+    key: 'snapshot',
+    value: function snapshot() {
+      var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'png';
+      var fileName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Date().getTime();
+
+      // Type: png, jpeg
+      var imageType = 'image/' + type;
+      var base64 = this._canvasElement.toDataURL(imageType);
+      var blob = this._base64toBlob(base64);
+      this._saveBlob(blob, fileName);
+    }
+  }, {
+    key: 'isPaused',
+    value: function isPaused() {
+      return this._timerId === null;
+    }
+  }, {
+    key: 'pause',
+    value: function pause() {
+      clearInterval(this._timerId);
+      this._timerId = null;
+      var tracks = this._stream.getVideoTracks();
+      tracks[0].stop();
+    }
+  }]);
+
+  return RealTimeCamera;
+}();
+
+exports.default = RealTimeCamera;
+
+},{"./filter":1}]},{},[2]);
