@@ -23,28 +23,33 @@ export default class RealTimeCamera {
     this._startSyncVideoToCanvas();
   }
 
+  _handleSuccess(stream) {
+    this._stream = stream;
+    try {
+      this._videoElement.src = window.URL.createObjectURL(stream);
+    } catch (e) {
+      this._videoElement.srcObject = stream;
+    }
+    this._videoElement.onloadedmetadata = () => {
+      this._videoSize = {
+        width: this._videoElement.videoWidth,
+        height: this._videoElement.videoHeight,
+      };
+      this._videoElement.style.width = this._videoSize.width + 'px';
+      this._videoElement.style.height = this._videoSize.height + 'px';
+      this._videoElement.play();
+    };
+  }
+
   _startStreamToVideo() {
     navigator.getUserMedia(
       this._options,
-      stream => {
-        this._stream = stream;
-        try {
-          this._videoElement.src = window.URL.createObjectURL(stream);
-        } catch (e) {
-          this._videoElement.srcObject = stream;
-        }
-        this._videoElement.onloadedmetadata = () => {
-          this._videoSize = {
-            width: this._videoElement.videoWidth,
-            height: this._videoElement.videoHeight,
-          };
-          this._videoElement.style.width = this._videoSize.width + 'px';
-          this._videoElement.style.height = this._videoSize.height + 'px';
-          this._videoElement.play();
-        };
-      },
+      this._handleSuccess.bind(this),
       err => {
-        console.log(err);
+        if (err.constraintName === 'facingMode') {
+          this._options.video = true;
+          this._startStreamToVideo();
+        }
       },
     );
   }

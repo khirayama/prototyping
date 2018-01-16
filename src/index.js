@@ -12,13 +12,15 @@ window.addEventListener('DOMContentLoaded', () => {
     canvas.height = size;
     realTimeCamera = new RealTimeCamera(canvas, {
       // FYI: video: {width: number, height: number} is not supported in Safari
-      video: true,
+      video: {
+        aspectRatio: 1,
+        facingMode: {
+          exact: 'environment',
+        },
+      },
       frameRate: {
         ideal: 25,
         max: 50,
-      },
-      facingMode: {
-        exact: 'environment',
       },
     });
   }

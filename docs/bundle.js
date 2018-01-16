@@ -296,13 +296,15 @@ window.addEventListener('DOMContentLoaded', function () {
     canvas.height = size;
     realTimeCamera = new _realTimeCamera2.default(canvas, {
       // FYI: video: {width: number, height: number} is not supported in Safari
-      video: true,
+      video: {
+        aspectRatio: 1,
+        facingMode: {
+          exact: 'environment'
+        }
+      },
       frameRate: {
         ideal: 25,
         max: 50
-      },
-      facingMode: {
-        exact: 'environment'
       }
     });
   }
@@ -533,55 +535,63 @@ var RealTimeCamera = function () {
   }
 
   _createClass(RealTimeCamera, [{
-    key: '_startStreamToVideo',
-    value: function _startStreamToVideo() {
+    key: '_handleSuccess',
+    value: function _handleSuccess(stream) {
       var _this = this;
 
-      navigator.getUserMedia(this._options, function (stream) {
-        _this._stream = stream;
-        try {
-          _this._videoElement.src = window.URL.createObjectURL(stream);
-        } catch (e) {
-          _this._videoElement.srcObject = stream;
-        }
-        _this._videoElement.onloadedmetadata = function () {
-          _this._videoSize = {
-            width: _this._videoElement.videoWidth,
-            height: _this._videoElement.videoHeight
-          };
-          _this._videoElement.style.width = _this._videoSize.width + 'px';
-          _this._videoElement.style.height = _this._videoSize.height + 'px';
-          _this._videoElement.play();
+      this._stream = stream;
+      try {
+        this._videoElement.src = window.URL.createObjectURL(stream);
+      } catch (e) {
+        this._videoElement.srcObject = stream;
+      }
+      this._videoElement.onloadedmetadata = function () {
+        _this._videoSize = {
+          width: _this._videoElement.videoWidth,
+          height: _this._videoElement.videoHeight
         };
-      }, function (err) {
-        console.log(err);
+        _this._videoElement.style.width = _this._videoSize.width + 'px';
+        _this._videoElement.style.height = _this._videoSize.height + 'px';
+        _this._videoElement.play();
+      };
+    }
+  }, {
+    key: '_startStreamToVideo',
+    value: function _startStreamToVideo() {
+      var _this2 = this;
+
+      navigator.getUserMedia(this._options, this._handleSuccess.bind(this), function (err) {
+        if (err.constraintName === 'facingMode') {
+          _this2._options.video = true;
+          _this2._startStreamToVideo();
+        }
       });
     }
   }, {
     key: '_startSyncVideoToCanvas',
     value: function _startSyncVideoToCanvas() {
-      var _this2 = this;
+      var _this3 = this;
 
       var width = this._canvasElement.width;
       var height = this._canvasElement.height;
       var size = null;
       var startX = 0;
       this._timerId = setInterval(function () {
-        if (_this2._videoSize.width > _this2._videoSize.height) {
-          size = _this2._videoSize.height;
-          startX = (_this2._videoSize.width - size) / 2;
-        } else if (_this2._videoElement.width < _this2._videoElement.height) {
-          size = _this2._videoSize.width;
+        if (_this3._videoSize.width > _this3._videoSize.height) {
+          size = _this3._videoSize.height;
+          startX = (_this3._videoSize.width - size) / 2;
+        } else if (_this3._videoElement.width < _this3._videoElement.height) {
+          size = _this3._videoSize.width;
         } else {
           size = width;
         }
 
-        _this2._ctx.drawImage(_this2._videoElement, startX, 0, size, size, 0, 0, width, height);
-        if (_this2._filter !== null) {
-          var imageData = _this2._ctx.getImageData(0, 0, size, size);
+        _this3._ctx.drawImage(_this3._videoElement, startX, 0, size, size, 0, 0, width, height);
+        if (_this3._filter !== null) {
+          var imageData = _this3._ctx.getImageData(0, 0, size, size);
           var data = imageData.data;
-          _this2._filter(data);
-          _this2._ctx.putImageData(imageData, 0, 0);
+          _this3._filter(data);
+          _this3._ctx.putImageData(imageData, 0, 0);
         }
       }, 1000 / 30);
     }
