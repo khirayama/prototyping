@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
       video: {
         aspectRatio: 1,
         width: {
-          ideal: 2560,
+          ideal: 3840,
         },
         facingMode: {
           exact: 'environment',
@@ -85,8 +85,8 @@ window.addEventListener('DOMContentLoaded', () => {
       realTimeCamera.start();
       snapshotButton.innerText = 'SNAPSHOT';
     } else {
-      realTimeCamera.snapshot('png', `snapshot_${new Date().getTime()}.png`);
       realTimeCamera.pause();
+      realTimeCamera.snapshot('png', `snapshot_${new Date().getTime()}.png`);
       snapshotButton.innerText = 'RETRY';
     }
   });

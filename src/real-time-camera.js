@@ -5,6 +5,12 @@ export default class RealTimeCamera {
     this._options = options;
     this._timerId = null;
     this._stream = null;
+    this._size = null;
+    this._startX = 0;
+    this._videoSize = {
+      width: 0,
+      height: 0,
+    };
 
     this._filter = null;
     this._canvasElement = canvasElement;
@@ -15,8 +21,7 @@ export default class RealTimeCamera {
     this._videoElement.webkitPlaysInline = true;
     this._videoElement.style.display = 'none';
 
-    this._startStreamToVideo();
-    this._startSyncVideoToCanvas();
+    this.start();
   }
 
   _handleSuccess(stream) {
@@ -44,28 +49,28 @@ export default class RealTimeCamera {
   _startSyncVideoToCanvas() {
     const width = this._canvasElement.width;
     const height = this._canvasElement.height;
-    let size = null;
-    let startX = 0;
 
     this._videoElement.addEventListener('loadedmetadata', () => {
       const videoWidth = this._videoElement.videoWidth;
       const videoHeight = this._videoElement.videoHeight;
 
+      this._videoSize.width = videoWidth;
+      this._videoSize.height = videoHeight;
       this._videoElement.style.width = videoWidth + 'px';
       this._videoElement.style.height = videoHeight + 'px';
       this._videoElement.play();
       if (videoWidth > videoHeight) {
-        size = videoHeight;
-        startX = (videoWidth - size) / 2;
+        this._size = videoHeight;
+        this._startX = (videoWidth - this._size) / 2;
       } else if (videoWidth < videoHeight) {
-        size = videoWidth;
+        this._size = videoWidth;
       } else {
-        size = width;
+        this._size = width;
       }
     });
 
     this._timerId = setInterval(() => {
-      this._ctx.drawImage(this._videoElement, startX, 0, size, size, 0, 0, width, height);
+      this._ctx.drawImage(this._videoElement, this._startX, 0, this._size, this._size, 0, 0, width, height);
       if (this._filter !== null) {
         const imageData = this._ctx.getImageData(0, 0, width, height);
         const data = imageData.data;
@@ -105,15 +110,30 @@ export default class RealTimeCamera {
   }
 
   snapshot(type = 'png', fileName = new Date().getTime()) {
+    const canvas = window.document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = this._videoSize.width;
+    canvas.height = this._videoSize.height;
+    ctx.drawImage(this._videoElement, this._startX, 0, this._size, this._size, 0, 0, this._size, this._size);
+    const imageData = ctx.getImageData(0, 0, this._size, this._size);
+    const data = imageData.data;
+    this._filter(data);
+    ctx.putImageData(imageData, 0, 0);
+
     // Type: png, jpeg
     const imageType = `image/${type}`;
-    const base64 = this._canvasElement.toDataURL(imageType);
+    const base64 = canvas.toDataURL(imageType);
     const blob = this._base64toBlob(base64);
     this._saveBlob(blob, fileName);
   }
 
   isPaused() {
     return this._timerId === null;
+  }
+
+  start() {
+    this._startStreamToVideo();
+    this._startSyncVideoToCanvas();
   }
 
   pause() {

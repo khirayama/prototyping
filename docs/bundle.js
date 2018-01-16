@@ -299,7 +299,7 @@ window.addEventListener('DOMContentLoaded', function () {
       video: {
         aspectRatio: 1,
         width: {
-          ideal: 2560
+          ideal: 3840
         },
         facingMode: {
           exact: 'environment'
@@ -384,8 +384,8 @@ window.addEventListener('DOMContentLoaded', function () {
       realTimeCamera.start();
       snapshotButton.innerText = 'SNAPSHOT';
     } else {
-      realTimeCamera.snapshot('png', 'snapshot_' + new Date().getTime() + '.png');
       realTimeCamera.pause();
+      realTimeCamera.snapshot('png', 'snapshot_' + new Date().getTime() + '.png');
       snapshotButton.innerText = 'RETRY';
     }
   });
@@ -519,6 +519,12 @@ var RealTimeCamera = function () {
     this._options = options;
     this._timerId = null;
     this._stream = null;
+    this._size = null;
+    this._startX = 0;
+    this._videoSize = {
+      width: 0,
+      height: 0
+    };
 
     this._filter = null;
     this._canvasElement = canvasElement;
@@ -529,8 +535,7 @@ var RealTimeCamera = function () {
     this._videoElement.webkitPlaysInline = true;
     this._videoElement.style.display = 'none';
 
-    this._startStreamToVideo();
-    this._startSyncVideoToCanvas();
+    this.start();
   }
 
   _createClass(RealTimeCamera, [{
@@ -562,28 +567,28 @@ var RealTimeCamera = function () {
 
       var width = this._canvasElement.width;
       var height = this._canvasElement.height;
-      var size = null;
-      var startX = 0;
 
       this._videoElement.addEventListener('loadedmetadata', function () {
         var videoWidth = _this2._videoElement.videoWidth;
         var videoHeight = _this2._videoElement.videoHeight;
 
+        _this2._videoSize.width = videoWidth;
+        _this2._videoSize.height = videoHeight;
         _this2._videoElement.style.width = videoWidth + 'px';
         _this2._videoElement.style.height = videoHeight + 'px';
         _this2._videoElement.play();
         if (videoWidth > videoHeight) {
-          size = videoHeight;
-          startX = (videoWidth - size) / 2;
+          _this2._size = videoHeight;
+          _this2._startX = (videoWidth - _this2._size) / 2;
         } else if (videoWidth < videoHeight) {
-          size = videoWidth;
+          _this2._size = videoWidth;
         } else {
-          size = width;
+          _this2._size = width;
         }
       });
 
       this._timerId = setInterval(function () {
-        _this2._ctx.drawImage(_this2._videoElement, startX, 0, size, size, 0, 0, width, height);
+        _this2._ctx.drawImage(_this2._videoElement, _this2._startX, 0, _this2._size, _this2._size, 0, 0, width, height);
         if (_this2._filter !== null) {
           var imageData = _this2._ctx.getImageData(0, 0, width, height);
           var data = imageData.data;
@@ -630,9 +635,19 @@ var RealTimeCamera = function () {
       var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'png';
       var fileName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : new Date().getTime();
 
+      var canvas = window.document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      canvas.width = this._videoSize.width;
+      canvas.height = this._videoSize.height;
+      ctx.drawImage(this._videoElement, this._startX, 0, this._size, this._size, 0, 0, this._size, this._size);
+      var imageData = ctx.getImageData(0, 0, this._size, this._size);
+      var data = imageData.data;
+      this._filter(data);
+      ctx.putImageData(imageData, 0, 0);
+
       // Type: png, jpeg
       var imageType = 'image/' + type;
-      var base64 = this._canvasElement.toDataURL(imageType);
+      var base64 = canvas.toDataURL(imageType);
       var blob = this._base64toBlob(base64);
       this._saveBlob(blob, fileName);
     }
@@ -640,6 +655,12 @@ var RealTimeCamera = function () {
     key: 'isPaused',
     value: function isPaused() {
       return this._timerId === null;
+    }
+  }, {
+    key: 'start',
+    value: function start() {
+      this._startStreamToVideo();
+      this._startSyncVideoToCanvas();
     }
   }, {
     key: 'pause',
