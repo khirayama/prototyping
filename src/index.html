@@ -29,7 +29,7 @@ p {
   overflow: scroll;
 }
 .box--inner {
-  width: calc(80px * 14 + 8px * 13);
+  width: calc(80px * 10 + 8px * 9);
 }
 .filter-button {
   display: inline-block;
@@ -53,27 +53,19 @@ p {
   </head>
   <body>
     <canvas id="canvas"></canvas>
-    <div class="box">
-      <p>CONTRAST: <input name="contrast" type="range" min="0" max="255"></p>
-      <p>BRIGHTNESS: <input name="brightness" type="range" min="0" max="255"></p>
-    </div>
     <p>FILTERS</p>
     <div class="box">
       <div class="box--inner">
         <button class="filter-button" data-filtername="none">NONE</button>
-        <button class="filter-button" data-filtername="grayscale">GRAYSCALE</button>
-        <button class="filter-button" data-filtername="sepia" data-options="0.6">SEPIA</button>
-        <button class="filter-button" data-filtername="invert">INVERT</button>
-        <button class="filter-button" data-filtername="brightness" data-options="-0.2">BRIGHTNESS (DARKER)</button>
-        <button class="filter-button" data-filtername="brightness" data-options="0.45">BRIGHTNESS (LIGHTER)</button>
-        <button class="filter-button" data-filtername="hueSaturation" data-options="0.6">HUE SATURATION</button>
-        <button class="filter-button" data-filtername="saturation" data-options="-0.001">SATURATION (NEGATIVE)</button>
-        <button class="filter-button" data-filtername="saturation" data-options="0.001">SATURATION (POSITIVE)</button>
-        <button class="filter-button" data-filtername="contrast" data-options="-0.1">CONTRAST (NEGATIVE)</button>
-        <button class="filter-button" data-filtername="contrast" data-options="0.2">CONTRAST (POSITIVE)</button>
-        <button class="filter-button" data-filtername="colorFilter" data-options="[100, 100, 100]">COLOR FILTER</button>
-        <button class="filter-button" data-filtername="rgbAdjust" data-options="[100, 100, 100]">RGB ADJUST</button>
-        <button class="filter-button" data-filtername="convolute" data-options="[100, 100, 100]">CONVOLUTE</button>
+        <button class="filter-button" data-filtername="amoro">AMORO</button>
+        <button class="filter-button" data-filtername="mayfair">MAYFAIR</button>
+        <button class="filter-button" data-filtername="rise">RISE</button>
+        <button class="filter-button" data-filtername="hudson">HUDSON</button>
+        <button class="filter-button" data-filtername="valencia">VALENCIA</button>
+        <button class="filter-button" data-filtername="xPro2">X-Pro 2</button>
+        <button class="filter-button" data-filtername="sierra">SIERRA</button>
+        <button class="filter-button" data-filtername="willow">WILLOW</button>
+        <button class="filter-button" data-filtername="loFi">Lo-Fi</button>
       </div>
     </div>
     <p>
